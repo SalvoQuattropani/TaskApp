@@ -1,0 +1,5 @@
+HOST: 'db4free.net'
+USER: 'sql8141893'
+PASSWORD: 'h7ubsm6bYm'
+DATABASE_NAME: 'sql8141893'
+PORT: '3307'

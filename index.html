@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Task app</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width">
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800"
+		rel="stylesheet">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/normalize.min.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/graf.css">
+
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<!-- App Styles -->
+	<link rel="stylesheet" href="css/style.css">
+
+	<!-- Angular Material requires Angular.js Libraries -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+
+	<!-- Angular Material Library -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+
+	<!--Socket.IO-->
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+	<!-- Code Behind -->
+	<script src="modules/app.module.js"></script>
+	<script src="controllers/todo.controller.js"></script>
+	<script src="directives/customList.directive.js"></script>
+	<script src="directives/customListAll.directive.js"></script>
+	<script src="services/item.service.js"></script>
+	<script src="services/login.service.js"></script>
+	<script src="services/storage.service.js"></script>
+	<script src="services/user.service.js"></script>
+	<script src="services/socket.service.js"></script>
+	<script src="controllers/login.controller.js"></script>
+	<!-- templatemo 410 circle -->
+</head>
+
+<body ng-app="todoApp" class="no-scroll">
+	<div ng-controller="LoginController as logctrl" class="no-scroll" ng-init="logctrl.CallCheckActiveUserSession()">
+		<!--LoginController in testa-->
+		<div ng-controller="TodoController as ctrl" class="scroll">
+			<!--ToDoController subito sotto-->
+			<div class="container-fluid">
+				<div class="row">
+					<div ng-show="!isLoggedIn">
+						<div class="col-md-4 col-sm-12  menu-bar">
+							<div class="sidebar-menu">
+								<div class="logo-wrapper">
+									<h1 class="logo">
+										<a href="#"><img src="images/logo.png" alt="Circle Template">
+											<span>Your Personal Agenda</span></a>
+									</h1>
+								</div>
+								<!-- /.logo-wrapper -->
+								<div class="menu-wrapper">
+									<ul class="menu">
+										<li>
+											<md-button ng-click="logctrl.CallUserLogin()">Login</md-button>
+										</li>
+										<li>
+											<md-button ng-click="logctrl.CallUserSignIn()" aria-label="Settings"><span> Sign in</span></li>
+										</md-button>
+									</ul>
+									<!-- /.menu -->
+									<a href="#" class="toggle-menu"><i class="fa fa-bars "></i></a>
+								</div>
+								<!-- /.menu-wrapper -->
+							</div>
+							<!-- /.sidebar-menu -->
+						</div>
+					</div>
+					<!-- /.col-md-4 -->
+
+
+
+					<div class="no-scroll">
+                        <div ng-show="isLoggedIn">
+							<div class="col-md-4 col-sm-12 menu-bar">
+								<div class="sidebar-menu">
+									<div class="logo-wrapper">
+										<h1 class="logo">
+											<a href="#"><img src="images/logo.png" alt="Circle Template">
+												<span>Welcome {{ nameUser}}</span></a>
+										</h1>
+									</div>
+									<!-- /.logo-wrapper -->
+
+									<div class="menu-wrapper">
+										<ul class="menu">
+											<li>
+												<md-button ng-click=" ctrl.resetListOfSelection(); logctrl.CallUserLogout(IDUser)">Logout</md-button>
+											</li>
+
+											<li>
+												<md-button ng-click="ctrl.callUserSettings()">User settings</md-button>
+												</md-menu-item>
+											</li>
+
+										</ul>
+										<!-- /.menu -->
+										<a href="#" class="toggle-menu"><i class="fa fa-bars"></i></a>
+									</div>
+									<!-- /.menu-wrapper -->
+								</div>
+								<!-- /.sidebar-menu -->
+							</div>
+						</div>
+						<!-- /.col-md-4 -->
+
+					<div layout="column" class="no-scroll" ng-if="isLoggedIn" ng-init="ctrl.setItems()">
+							<md-content style="margin-left:20px;margin-right:20px;">
+								<md-toolbar class="md-primary md-toolbar-task">
+									<div ng-show="isLoggedIn">
+										<div class="filter_max">
+											<md-input-container md-no-float class="md-accent" style="padding-left:20px;">
+												<input type="search" ng-model="ctrl.filterByName" placeholder="Filter By Name" size="15" style="color:white;"></input>
+											</md-input-container>
+											<md-input-container md-no-float class="md-accent" style="padding-left:20px;">
+												<input type="search" placeholder="GG/MM/AAAA" ng-model="ctrl.filterByDate" size="10" style="color:white;" required></input>
+											</md-input-container>
+											<md-button class="md-icon-button" style="margin-top:-20px;" aria-label="Search">
+												<md-tooltip>Search</md-tooltip>
+												<md-icon class="material-icons">&#xE8B6;</md-icon>
+											</md-button>
+										</div>
+
+										<div class="filter_min">
+											<md-input-container md-no-float class="md-accent" style="padding-left:10px; ">
+												<input type="search" ng-model="ctrl.filterByName" placeholder="Filter By Name" size="10" style="color:white; height:20px; font-size:15px"></input>
+											</md-input-container><br>
+											<md-input-container md-no-float class="md-accent" style="padding-left:10px;margin-top:-80px; margin-bottom:-40px">
+												<input type="search" placeholder="GG/MM/AAAA" ng-model="ctrl.filterByDate" size="9" style=" 0px;color:white;  height:20px; font-size:15px"
+													required></input>
+											</md-input-container>
+											<md-button class="md-icon-button" style="margin-top:-60px;" aria-label="Search">
+												<md-tooltip>Search</md-tooltip>
+												<md-icon class="material-icons">&#xE8B6;</md-icon>
+											</md-button>
+										</div>
+										<md-button ng-disabled="ctrl.selectedItem == null" ng-click="ctrl.CallDeleteItem()" class="md-fab add-button " aria-label="Delete">
+											<md-icon> delete </md-icon>
+										</md-button>
+										<md-button ng-if="ctrl.selectedItem == null" class="md-fab  add-button" aria-label="Add Todo" ng-click="ctrl.addTask($event)">
+											<md-icon>add</md-icon>
+										</md-button>
+									</div>
+								</md-toolbar>
+
+							<md-tabs md-dynamic-height md-border-bottom>
+									<md-tab label="Todo ">
+                                        <custom-list items="ctrl.items" id-user="IDUser" list-ofselection="ctrl.listOfselection" selected-item="ctrl.selectedItem" filter-function="ctrl.notDone" filter-name="ctrl.filterByName" filter-date="ctrl.filterByDate"></custom-list>
+									</md-tab>
+									<md-tab label="Done">
+										<custom-list items="ctrl.items" id-user="IDUser" list-ofselection="ctrl.listOfselection" selected-item="ctrl.selectedItem"
+											filter-function="ctrl.done" filter-name="ctrl.filterByName" filter-date="ctrl.filterByDate"></custom-list>
+									</md-tab>
+									<md-tab label="All">
+										<custom-list-all items="ctrl.items" id-user="IDUser" list-ofselection="ctrl.listOfselection" selected-item="ctrl.selectedItem"
+											filter-function="ctrl.all" filter-name="ctrl.filterByName" filter-date="ctrl.filterByDate"></custom-list>
+									</md-tab>
+								</md-tabs>
+							</md-content>
+						</div>
+					</div>
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- /.container-fluid -->
+		</div>
+		<!--ToDoController-->
+	</div>
+	<!--LoginController-->
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12 footer">
+				<p id="footer-text">
+					Copyright &copy; 2016 <a href="#">Salvatore Quattropani &amp; Paolo Walter Modica</a>
+				</p>
+			</div>
+			<!-- /.footer -->
+		</div>
+	</div>
+	<!-- /.container-fluid -->
+	<script src="js/jquery-1.10.1.min.js"></script>
+	<script src="js/main.js"></script>
+
+	<!---signIn template-->
+
+	<script type="text/ng-template" id="signIn.html">
+        <md-dialog  class="dialog" class="no-scroll" >
+            <form name="InputForm" novalidate>
+                <md-toolbar>
+                    <div class="md-toolbar-tools">                      
+                        <span flex>Sign in</span>                        
+                  <md-button class="md-icon-button" ng-click="sc.cancel()">
+                  <md-icon>close</md-icon>
+                 </md-button>                        
+                    </div>
+                </md-toolbar>
+                <md-dialog-content>
+                    <md-content layout-padding ng-cloak>                    
+                                <md-input-container>
+                            <label>Name</label>
+                            <input type="text"  ng-minlength="1" ng-maxlength="15" name="name" ng-model="sc.user.name" ng-class="{'red':InputForm.input.$invalid}" required />                         
+                           <div  align="right"> <ng-hint> {{sc.user.name.length || 0}}/15</ng-hint></div>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Last name</label>
+                            <input type="text" ng-minlength="1" ng-maxlength="15" name="lastname" ng-model="sc.user.lastname" ng-class="{'red':InputForm.input.$invalid}" required />
+                            <div  align="right"> <ng-hint> {{sc.user.lastname.length || 0}}/15</ng-hint></div>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Email</label>
+                            <input type="text" ng-minlength="4" ng-maxlength="50" name="email" ng-model="sc.user.email" required  ng-pattern="/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i" ng-class="{'red':InputForm.input.$invalid}"/>
+                            <div  align="right"> <ng-hint> {{sc.user.email.length || 0}}/50</ng-hint></div>
+                        </md-input-container><br>
+                         <input type="reset" class="md-button " value="Reset"></input>
+                        <input type="submit" class="md-button " value="Save"  ng-click="InputForm.$valid&&sc.save()"></input>
+                    </form>   
+                   </md-content>
+                </md-dialog-content> 
+            </md-dialog> 
+    </script>
+
+	<!--task template-->
+
+	<script type="text/ng-template" id="addTask.html">
+        <md-dialog  class="dialog" class="no-scroll" ng-init="atc.setItems(atc.locals.IDUser)">
+            <form name="taskInputForm" class="no-scroll" novalidate>
+                <md-toolbar>
+                    <div class="md-toolbar-tools" class="no-scroll">                        
+                        <span flex> Add a new task</span>                        
+                  <md-button class="md-icon-button" ng-click="atc.cancel()">
+                  <md-icon>close</md-icon>
+                 </md-button>                        
+                    </div>
+                </md-toolbar>
+                <md-dialog-content>
+                    <md-content layout-padding ng-cloak>                       
+                        <md-input-container>
+                            <label>Task Title</label>
+                            <input type="text" name="name" ng-minlength="1" ng-maxlength="15"  ng-model="atc.items.name" ng-class="{'red':input.name.$invalid}" required  /></input>
+                            <div  align="right"> <ng-hint> {{atc.items.name.length || 0}}/15</ng-hint></div>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Description</label>
+                            <textarea name="description" ng-minlength="1" ng-maxlength="255" ng-model="atc.items.description" ng-class="{'red':input.$invalid}" required /></textarea>
+                           <div  align="right"> <ng-hint> {{atc.items.description.length || 0}}/255</ng-hint></div>                            
+                        </md-input-container>
+                        <md-input-container>
+                         <label>Expiration date</label>
+                           <md-datepicker md-min-date="atc.dateOptions" ng-model="atc.items.exp_date"  required></md-datepicker>                             
+                        </md-input-container>
+                            <md-input-container>
+                            <label>Priority</label><br><br>
+                            <md-radio-group ng-model="atc.items.priority" layout="row" layout-align="layout-align-xs">
+                            <md-radio-button value="-1" class="md-primary">Low</md-radio-button>
+                            <md-radio-button value="0" class="md-primary"> Medium </md-radio-button>
+                            <md-radio-button value="1" class="md-primary" >High</md-radio-button>
+                            </md-radio-group>
+                        </md-input-container><br>
+                         <input type="reset" class="md-button " value="Reset"></input>
+                        <input type="submit" class="md-button "  value="Save" ng-click="taskInputForm.$valid&&atc.save_task(atc.locals.IDUser); "></input>
+                    </form>   
+                   </md-content>
+                </md-dialog-content> 
+            </md-dialog> 
+    </script>
+
+	<!--login template-->
+
+	<script type="text/ng-template" id="login.html">
+    <md-dialog  class="dialog" class="no-scroll">                 
+            <form name="LoginForm" novalidate>
+                <md-toolbar>
+                    <div class="md-toolbar-tools">
+                       <span flex>Login</span>
+                  <md-button class="md-icon-button" ng-click="lc.cancel()">
+                  <md-icon>close</md-icon>
+                 </md-button>
+                   </div>
+                </md-toolbar>
+                <md-dialog-content>
+                    <md-content layout-padding ng-cloak>
+                       </md-input-container>
+                        <md-input-container>
+                            <label>Email</label>
+                            <input type="text" name="email" ng-model="lc.email" required  ng-pattern="/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i">                            
+                        </md-input-container><br>
+                         <input type="reset" class="md-button " value="Reset"></input>
+                        <input type="submit" class="md-button " value="Login"  ng-click="LoginForm.$valid && lc.Checklogin()"></input>
+                    </form>  
+                   </md-content>                   
+                </md-dialog-content> 
+            </md-dialog> 
+    </script>
+
+	<!--user settings template-->
+
+	<script type="text/ng-template" id="userSettings.html">
+        <md-dialog  class="dialog" class="no-scroll" >
+            <form name="SettingForm" novalidate>
+                <md-toolbar>
+                    <div class="md-toolbar-tools">                  
+                        <span flex>User settings</span>                        
+                  <md-button class="md-icon-button" ng-click="usc.cancel()">
+                  <md-icon>close</md-icon>
+                 </md-button>                        
+                    </div>
+                </md-toolbar>
+                <md-dialog-content>
+                    <md-content layout-padding ng-cloak>                       
+                        <md-input-container>
+                            <label>Name</label>
+                            <input type="text" ng-minlength="1" ng-maxlength="15" name="name" ng-model="usc.user.name" ng-class="{'red':InputForm.input.$invalid}"required  />
+                            <div  align="right"> <ng-hint> {{usc.user.name.length || 0}}/15</ng-hint></div>  
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Last name</label>
+                            <input type="text" ng-minlength="1" ng-maxlength="15" name="lastname" ng-model="usc.user.lastname" ng-class="{'red':InputForm.input.$invalid}" required />
+                            <div  align="right"> <ng-hint> {{usc.user.lastname.length  || 0}}/15</ng-hint></div>  
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Email </label>
+                            <input type="text" ng-minlength="4" ng-maxlength="50" name="email" ng-model="usc.user.email" required  ng-pattern="/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i" ng-class="{'red':InputForm.input.$invalid}">
+                            <div  align="right"> <ng-hint> {{usc.user.email.length  || 0}}/50</ng-hint></div> 
+                        </md-input-container><br>                       
+                        <input type="submit" class="md-button " value="Edit"  ng-click="SettingForm.$valid&&usc.editUser()"></input>
+                    </form>   
+                   </md-content>
+                </md-dialog-content> 
+            </md-dialog> 
+    </script>
+</body>
+</html>
